@@ -1,25 +1,25 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: keyvaultapp-deployment
+  name: azureblobapp-deployment
 spec:
   selector:
     matchLabels:
-      app: keyvaultapp
+      app: azureblobapp
   template:
     metadata:
       labels:
-        app: keyvaultapp
+        app: azureblobapp
         azure.workload.identity/use: "true"
     spec:
-      serviceAccountName: keyvaultapp-serviceaccount
+      serviceAccountName: azureblobapp-serviceaccount
       containers:
-        - name: keyvaultapp
-          image: ordercontainerregistry.azurecr.io/keyvaultapp:1.0.3
+        - name: azureblobapp
+          image: ordercontainerregistry.azurecr.io/azureblobapp:1.0.1
           ports:
             - containerPort: 5002
           env:
-            - name: KeyVaultSetting__Url
+            - name: BlobSettings__Url
               value: https://myorderkeyvault.vault.azure.net/
            
           resources:
