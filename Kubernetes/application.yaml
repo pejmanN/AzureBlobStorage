@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: keyvaultapp-deployment
+spec:
+  selector:
+    matchLabels:
+      app: keyvaultapp
+  template:
+    metadata:
+      labels:
+        app: keyvaultapp
+        azure.workload.identity/use: "true"
+    spec:
+      serviceAccountName: keyvaultapp-serviceaccount
+      containers:
+        - name: keyvaultapp
+          image: ordercontainerregistry.azurecr.io/keyvaultapp:1.0.3
+          ports:
+            - containerPort: 5002
+          env:
+            - name: KeyVaultSetting__Url
+              value: https://myorderkeyvault.vault.azure.net/
+           
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "150m"
+            requests:
+              memory: "128Mi"
+              cpu: "150m"
+      restartPolicy: Always
+  
+
