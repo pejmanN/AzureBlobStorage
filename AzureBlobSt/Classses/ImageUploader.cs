@@ -14,6 +14,9 @@ namespace AzureBlobSt.Classses
         public async Task<ImageUploadResult> UploadImageAsync(string blobContainerName, IFormFile file)
         {
             //Do ur validations like fileExtenstion and size ...
+            if (file == null || file.Length == 0)
+                return new ImageUploadResult { IsSucess = false, Message = "No file uploaded" };
+
 
             var containerClient = _blobServiceClient.GetBlobContainerClient(blobContainerName);
             await containerClient.CreateIfNotExistsAsync();

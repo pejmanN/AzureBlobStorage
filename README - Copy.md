@@ -67,3 +67,54 @@ az identity federated-credential create --name $federateCredentialName --identit
 
 ```
 
+
+## Step 3
+Preparing Azure Storage Blob
+
+✅ Azure Storage Account vs Azure Storage
+Term	Meaning
+Azure Storage	The overall service that includes multiple storage options: Blob, File, Queue, Table, and Disk.
+Azure Storage Account	A container or namespace in Azure that gives you access to those storage types. You must create a Storage Account first to use any Azure Storage services.
+
+🔧 Example:
+Azure Storage = The whole building
+
+Storage Account = One apartment unit you rent
+
+Blob Container = A closet inside your apartment
+
+Blob (Image/File) = The actual item you put in the closet
+
+So yes, a "Storage Account" is your entry point to using Azure Storage services.
+
+
+Create the Storage Account:
+```
+$storageAccountName="orderblobstorage"
+az storage account create  --name $storageAccountName  --resource-group $serviceGroupName --location $resourceGroupLocation  --sku Standard_LRS  --kind StorageV2  --allow-blob-public-access false
+
+```
+
+Assign RBAC Role to Managed Identity
+```
+az role assignment create --assignee $MANAGE_IDENTITY_CLIENT_ID --role "Storage Blob Data Owner" --scope /subscriptions/$(az account show --query id -o tsv)/resourceGroups/$resourceGroupName/providers/Microsoft.Storage/storageAccounts/$storageAccountName
+
+```
+
+Update Your App Configuration
+```
+env:
+  - name: BlobSettings__Url
+    value: https://orderblobstorage.blob.core.windows.net
+
+```
+
+
+## Step 4
+✅ Azure Front Door Setup (Performance + Global Routing)
+
+Create Azure Front Door Standard/Premium
+```
+az network front-door profile create --name orderFrontDoor --resource-group $serviceGroupName --sku Standard_AzureFrontDoor
+
+```
