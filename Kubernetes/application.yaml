@@ -15,12 +15,12 @@ spec:
       serviceAccountName: azureblobapp-serviceaccount
       containers:
         - name: azureblobapp
-          image: ordercontainerregistry.azurecr.io/azureblobapp:1.0.1
+          image: ordercontainerregistry.azurecr.io/azureblobapp:1.0.2
           ports:
             - containerPort: 5002
           env:
             - name: BlobSettings__Url
-              value: https://myorderkeyvault.vault.azure.net/
+              value: https://orderblobstorage01.blob.core.windows.net
            
           resources:
             limits:

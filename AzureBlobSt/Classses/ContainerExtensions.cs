@@ -17,9 +17,10 @@ namespace AzureBlobSt.Classses
             builder.Services.AddSingleton(serviceProvider =>
             {
                 var environment = serviceProvider.GetRequiredService<IHostEnvironment>();
-                return environment.IsDevelopment() ?
-                    new BlobServiceClient(blobSetting.Url) :
-                    new BlobServiceClient(new Uri(blobSetting.Url), new DefaultAzureCredential());
+                return new BlobServiceClient(new Uri(blobSetting.Url), new DefaultAzureCredential());
+                //return environment.IsDevelopment() ?
+                //    new BlobServiceClient(blobSetting.Url) :
+                //    new BlobServiceClient(new Uri(blobSetting.Url), new DefaultAzureCredential());
             });
             return builder;
         }

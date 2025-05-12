@@ -20,9 +20,9 @@ namespace AzureBlobSt.Classses
 
             var containerClient = _blobServiceClient.GetBlobContainerClient(blobContainerName);
             await containerClient.CreateIfNotExistsAsync();
-            await containerClient.SetAccessPolicyAsync(PublicAccessType.None);
+            await containerClient.SetAccessPolicyAsync(PublicAccessType.Blob);
 
-            var blobClient = containerClient.GetBlobClient(file.Name);
+            var blobClient = containerClient.GetBlobClient(file.FileName);
             await blobClient.DeleteIfExistsAsync();
 
             using var fileStream = file.OpenReadStream();
