@@ -24,12 +24,12 @@ az acr create --name $azureContainerRegistryName --resource-group $serviceGroupN
 
 build Image and push it to ACR
 ```
-docker build -t azureblobapp:1.0.1 .
+docker build -t azureblobapp:1.0.2 .
 az acr login --name $azureContainerRegistryName
 $azureContainerRegistryAddress=$(az acr show --name $azureContainerRegistryName --query "loginServer" --output tsv)
-docker tag azureblobapp:1.0.1 "$azureContainerRegistryAddress/azureblobapp:1.0.1"
+docker tag azureblobapp:1.0.2 "$azureContainerRegistryAddress/azureblobapp:1.0.2"
 
-docker push "$azureContainerRegistryAddress/azureblobapp:1.0.1"
+docker push "$azureContainerRegistryAddress/azureblobapp:1.0.2"
 
 ```
 
@@ -102,9 +102,9 @@ az provider register --namespace Microsoft.Storage
 Assign RBAC Role to Managed Identity
 ```
 az role assignment create `
->>   --assignee $MANAGE_IDENTITY_CLIENT_ID `
->>   --role "Storage Blob Data Owner" `
->>   --scope "/subscriptions/$(az account show --query id -o tsv)/resourceGroups/$serviceGroupName/providers/Microsoft.Storage/storageAccounts/$storageAccountName"
+   --assignee $MANAGE_IDENTITY_CLIENT_ID `
+   --role "Storage Blob Data Owner" `
+   --scope "/subscriptions/$(az account show --query id -o tsv)/resourceGroups/$serviceGroupName/providers/Microsoft.Storage/storageAccounts/$storageAccountName"
 
 ```
 
@@ -114,6 +114,13 @@ env:
   - name: BlobSettings__Url
     value: https://orderblobstorage01.blob.core.windows.net
 
+```
+
+For Testing:
+```
+http://20.253.171.31/api/image => POST
+
+https://orderblobstorage01.blob.core.windows.net/images/EASportsFC25.jpg  => GET
 ```
 
 
@@ -160,31 +167,48 @@ This method gives full control and works well in DevOps pipelines, production en
 ✅ 1. Create Front Door Profile (Standard SKU, WAF not attached)
 ```
 $fdProfileName = "orderfdprofile"
-az network front-door profile create --name $fdProfileName --resource-group $serviceGroupName --sku Standard_AzureFrontDoor
+az afd profile  create --name $fdProfileName --resource-group $serviceGroupName --sku Standard_AzureFrontDoor
 
 ```
 ✅ 2. Create Origin Group
 ```
 $originGroupName = "bloboriginGroup"
-az network front-door origin-group create --resource-group $serviceGroupName --profile-name $fdProfileName --name $originGroupName --probe-request-type GET --probe-protocol Https  --probe-path "/"
+az afd origin-group create `
+  --resource-group $serviceGroupName `
+  --profile-name $fdProfileName `
+  --origin-group-name $originGroupName `
+  --probe-request-type GET `
+  --probe-protocol Https `
+  --probe-path "/" `
+  --sample-size 4 `
+  --successful-samples-required 3 `
+  --additional-latency 50
 
 ```
+--probe-request-type GET	This tells AFD to use HTTP GET requests to probe (health check) the origins in the group.
+--probe-protocol Https	Specifies that health probes should use HTTPS (not HTTP).
+--probe-path "/"	Sets the URL path for the health probe requests. In this case, it’s /, which means AFD will send probe requests to the root path of your backend.
+
 
 ✅ 3. Add Blob Storage as Origin
 ```
-az network front-door origin create   --resource-group $serviceGroupName   --profile-name $fdProfileName   --origin-group-name $originGroupName   --name $originName 
+$originName = "azurestroageorigin"
+az afd origin create   --resource-group $serviceGroupName   --profile-name $fdProfileName   --origin-group-name $originGroupName   --name $originName `
   --host-name "$storageAccountName.blob.core.windows.net"   --origin-host-header "$storageAccountName.blob.core.windows.net"   --http-port 80   --https-port 443
 ```
 
 ✅ 4. Create Frontend Endpoint
 ```
-az network front-door endpoint create   --resource-group $serviceGroupName   --profile-name $fdProfileName   --name $frontendEndpointName
+$frontendEndpointName ="blobfrontend"
+az afd endpoint create   --resource-group $serviceGroupName   --profile-name $fdProfileName   --name $frontendEndpointName
 
 ```
 
 ✅ 5. Create Route (with Caching + UseQueryString behavior)
 ```
-az network front-door route create   --resource-group $serviceGroupName   --profile-name $fdProfileName   --endpoint-name $frontendEndpointName   --origin-group $originGroupName   --name $routeName   --route-type Forward   --https-redirect Enabled   --patterns "/*"   --supported-protocols Https   --cache-enabled true 
+$routeName = "blobrouting"
+
+az afd route create   --resource-group $serviceGroupName   --profile-name $fdProfileName   --endpoint-name $frontendEndpointName   --origin-group $originGroupName  ` --name $routeName   --route-type Forward   --https-redirect Enabled   --patterns "/*"   --supported-protocols Https   --cache-enabled true `
   --query-parameter-strip none   --forwarding-protocol MatchRequest
 
 ```
@@ -193,6 +217,10 @@ az network front-door route create   --resource-group $serviceGroupName   --prof
 🚫 No --waf-policy-id: so WAF is not enabled
 
 
+For Testing :
+```
+https://blobfrontend-a7cafse7brhgdhfz.z02.azurefd.net/images/BlackMythWukong.jpg
+```
 
 
 ********************************* NOTE ***************************************
