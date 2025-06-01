@@ -99,6 +99,8 @@ NOTE=> Maybe in running above command u got error that the Microsoft.Storage res
 az provider register --namespace Microsoft.Storage
 ```
 
+NOTE=> If u are going to use SAS token (Shared Access Signature) You can even remove the --allow-blob-public-access true from the storage account.
+
 Assign RBAC Role to Managed Identity
 ```
 az role assignment create `
