@@ -1,0 +1,17 @@
+apiVersion: gateway.solo.io/v1
+kind: VirtualService
+metadata:
+  name: azure-blob-vs
+  namespace: azureblobapp
+spec:
+  virtualHost:
+    domains:
+      - '*'
+    routes:
+      - matchers:
+         - prefix: /image
+        routeAction:
+          single:
+            upstream:
+              name: azure-frontdoor-upstream
+              namespace: azureblobapp 

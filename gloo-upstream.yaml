@@ -1,0 +1,11 @@
+apiVersion: gloo.solo.io/v1
+kind: Upstream
+metadata:
+  name: azure-frontdoor-upstream
+  namespace: azureblobapp
+spec:
+  static:
+    hosts:
+      - addr: blobfrontend-a7cafse7brhgdhfz.z02.azurefd.net
+        port: 443
+    useTls: true 
