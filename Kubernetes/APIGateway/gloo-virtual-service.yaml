@@ -14,4 +14,4 @@ spec:
           single:
             upstream:
               name: azure-frontdoor-upstream
-              namespace: azureblobapp 
+              namespace: azureblobapp

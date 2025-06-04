@@ -18,6 +18,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionIt
 		README.md = README.md
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "APIGateway", "APIGateway", "{1E1F3397-31A3-4922-B4F3-69A7C87DF67B}"
+	ProjectSection(SolutionItems) = preProject
+		Kubernetes\APIGateway\gloo-upstream.yaml = Kubernetes\APIGateway\gloo-upstream.yaml
+		Kubernetes\APIGateway\gloo-virtual-service.yaml = Kubernetes\APIGateway\gloo-virtual-service.yaml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -31,6 +37,9 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{1E1F3397-31A3-4922-B4F3-69A7C87DF67B} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5378A410-D309-474E-BF7D-0B1F41F92462}
